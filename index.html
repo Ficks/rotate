@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<style>
+    .box,
+    .box1 {
+        width: 200px;
+        height: 200px;
+        background: #ccc;
+        margin: 150px auto;
+        /*position: relative;*/
+    }
+
+    .box:hover {
+        /*border: 2px solid #000;*/
+    }
+
+    .yuan,
+    .yuan1 {
+        position: absolute;
+        height: 20px;
+        width: 20px;
+        background: #000;
+        left: 0;
+        right: 0;
+        margin: auto;
+        top: -40px;
+        -moz-border-radius: 50%;
+        border-radius: 50%;
+        cursor: url(http://assets.rrxiu.net/www/images/mouserotate.ico), default;
+        position: relative;
+    }
+
+    .yuan span {
+        display: block;
+        width: 3px;
+        height: 20px;
+        background: #000;
+        position: relative;
+        left: 45%;
+        top: 20px
+    }
+</style>
+<script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+<body>
+    <div class="box">
+        <div class="yuan">
+            <span></span>
+        </div>
+        <div class="xz"></div>
+    </div>
+    <div class="box1">
+        <div class="yuan1">
+            <span></span>
+        </div>
+        <div class="xz"></div>
+    </div>
+    <script>                
+        (function ($) {
+            $.fn.RotateH = function (options) {
+                var defaults = {
+                    trigger: document,           //拖动按钮 默认 整个文档
+                    centerX: 0,                      //圆心点x 默认 对象中心x
+                    centerY: 0,                      //圆心点y 默认 对象中心y
+                    //inertia:true, 惯性旋转 开发中
+                    debug: false
+                }, _this = this;
+                var ops = $.extend(defaults, options);
+
+                //初始化
+                function Init() {
+                    //初始化圆心点
+                    if (ops.centerX == 0 && ops.centerY == 0) {
+                        ops.centerX = _this.offset().left + _this.width() / 2;
+                        ops.centerY = _this.offset().top + _this.height() / 2
+                    }
+                    $(ops.trigger).bind("mousedown", function () {
+                        $(document).bind("mousemove", movehandle);
+                    });
+                    $(document).mouseup(function (event) {
+                        $(document).unbind("mousemove");
+                        if (ops.inertia) inertiaShow();
+                    });
+                }
+                //鼠标移动时处理事件
+                function movehandle(event) {
+                    event = event || window.event;
+                    var dis = angle(ops.centerX, ops.centerY, event.clientX, event.clientY);
+                    if (ops.debug)
+                        // console.log(ops.centerX + "-" + ops.centerY + "|" + event.clientX + "-" + event.clientY + " " + dis);
+                        rotate(dis);
+                }
+                //计算两点的线在页面中的角度
+                function angle(centerx, centery, endx, endy) {
+                    var diff_x = endx - centerx,
+                        diff_y = endy - centery;
+                    var c = 360 * Math.atan2(diff_y, diff_x) / (2 * Math.PI);
+                    c = c <= -90 ? (360 + c) : c;
+                    return c + 90;
+                }
+                //惯性旋转
+                function inertiaShow(angle) {
+
+                }
+                //设置角度
+                function rotate(angle, step) {
+                    console.log(_this)
+                    $(_this).css("transform", "rotateZ(" + angle + "deg)");
+                }
+                Init();
+            };
+        })(jQuery);
+        $(".box").RotateH({ trigger: $(".yuan"), debug: true });
+        $(".box1").RotateH({ trigger: $(".yuan1"), debug: true });
+    </script>
+</body>
+
+</html>
